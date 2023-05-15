@@ -1,12 +1,6 @@
 <template>
   <NavBar :email="email" :logged="logged" @logoutEvent="updateEvent"/>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-  </div>
-
   <div>
-    <router-link to="/peliculas">Ver Peliculas</router-link> |
-    <router-link to="/libros">Ver Libros</router-link>
   </div>
 </template>
 
@@ -22,6 +16,7 @@ export default {
     return {
       email: '',
       logged: false,
+      books: [],
     };
   },
   methods: {
@@ -29,6 +24,8 @@ export default {
       const test = localStorage.getItem("token");
       if (test !== null) {
         this.currentUser(test);
+      } else {
+        this.$router.push('/');
       }
     },
     currentUser(token) {
@@ -43,11 +40,13 @@ export default {
       .then((res) => {
         this.logged = true;
         this.email = res.data.email;
+
       })
       .catch((error) => {
         localStorage.removeItem("token");
         this.logged = false;
         this.email = '';
+        this.$router.push('/')
       });
     },
     updateEvent() {
@@ -55,7 +54,7 @@ export default {
       this.email = '';
     }
   },
-  beforeMount() {
+  created() {
     this.checkUser()
   },
 };
