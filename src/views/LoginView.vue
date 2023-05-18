@@ -16,7 +16,7 @@
         </label>
       </div>
 
-      <button type="submit" @click="login">Iniciar sesión</button>
+      <button class="btn btn-primary" type="submit" @click="login">Iniciar sesión</button>
     </div>
 
     <div>

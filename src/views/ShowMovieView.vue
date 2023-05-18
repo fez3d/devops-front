@@ -1,26 +1,11 @@
 <template>
   <NavBar :email="email" :logged="logged" @logoutEvent="updateEvent"/>
   <div>
-    <div>
-      <h3>Registrase</h3>
-
-      <div class="form-group">
-        <label for="email">Email
-          <input id="email" v-model.trim="email" type="email" />
-        </label>
-      </div>
-
-      <div class="form-group">
-        <label for="password" >Contraseña
-          <input id="password" v-model="password" type="password" />
-        </label>
-      </div>
-
-      <button class="btn btn-primary" type="submit" @click="register">Registrarse</button>
-    </div>
-    <div>
-      {{ errorMsg }}
-    </div>
+    <p><b>Nombre:</b> {{ name }}</p>
+    <p><b>Editor:</b> {{ publisher }}</p>
+    <p><b>Genero:</b> {{ genre }}</p>
+    <p><b>Lanzamiento:</b> {{ release }}</p>
+    <p><b>Rating:</b> {{ rating }}</p>
   </div>
 </template>
 
@@ -35,34 +20,30 @@ export default {
   data() {
     return {
       email: '',
-      password: '',
-      errorMsg: '',
       logged: false,
+      name: '',
+      release: null,
+      genre: '',
+      publisher: '',
+      rating: null,
     };
   },
   methods: {
-    register() {
+    getMovie(id){
       const headers = {
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': localStorage.getItem("token")
         },
       };
-
-      const params = {
-        user: {
-          email: this.email,
-          password: this.password,
-        },
-      };
-
-      axios.post('http://localhost:3000/signup', params, headers)
+      axios.get(`http://localhost:3000/movies/${id}`, headers)
       .then((res) => {
-        localStorage.setItem("token", res.headers.get("Authorization"));
-        this.$router.push('/');
+        this.name = res.data.name;
+        this.release = res.data.release;
+        this.rating = res.data.rating;
+        this.genre = res.data.genre;
+        this.publisher = res.data.publisher;
       })
-      .catch((error) => {
-        this.errorMsg =  JSON.parse(error.request.response).status.message;
-      });
     },
     checkUser() {
       const test = localStorage.getItem("token");
@@ -80,7 +61,8 @@ export default {
 
       axios.get('http://localhost:3000/current_user', headers)
       .then((res) => {
-        this.$router.push('/')
+        this.logged = true;
+        this.email = res.data.email;
       })
       .catch((error) => {
         localStorage.removeItem("token");
@@ -93,8 +75,9 @@ export default {
       this.email = '';
     }
   },
-  created() {
+  beforeMount() {
     this.checkUser()
+    this.getMovie(this.$route.params.id)
   },
 };
 </script>
