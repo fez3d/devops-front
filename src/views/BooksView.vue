@@ -115,6 +115,7 @@ export default {
     this.checkUser()
   },
   beforeMount(){
+    this.checkUser();
     this.getBooks();
   }
 };
